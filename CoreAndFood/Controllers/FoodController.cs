@@ -8,9 +8,9 @@ namespace CoreAndFood.Controllers
 {
     public class FoodController : Controller
     {
-        Context c =new Context();
+        Context c = new Context();
         FoodRepository fr = new FoodRepository();
-        public IActionResult Index(int page=1)
+        public IActionResult Index(int page = 1)
         {
             return View(fr.TList("Category").ToPagedList(page, 3));
         }
@@ -18,26 +18,42 @@ namespace CoreAndFood.Controllers
         public IActionResult AddFood()
         {
             List<SelectListItem> values = (from x in c.Categories.ToList()
-                                          select new SelectListItem
-                                          {
-                                              Text = x.CategoryName,
-                                              Value = x.CategoryID.ToString()
-                                          }).ToList();
+                                           select new SelectListItem
+                                           {
+                                               Text = x.CategoryName,
+                                               Value = x.CategoryID.ToString()
+                                           }).ToList();
             ViewBag.v1 = values;
 
             return View();
         }
         [HttpPost]
-        public IActionResult AddFood(Food p)
+        public IActionResult AddFood(UrunEkle p)
         {
-            fr.TAdd(p);
+            Food f = new Food();
+            if (p.ImageURL != null)
+            {
+                var extension = Path.GetExtension(p.ImageURL.FileName);
+                var newimagename=Guid.NewGuid() + extension;
+                var location = Path.Combine(Directory.GetCurrentDirectory(),"wwwroot/Resimler/",newimagename);
+                var stream = new FileStream(location, FileMode.Create);
+                p.ImageURL.CopyTo(stream);
+                f.ImageURL = newimagename;
+            }
+            f.Name = p.Name;
+            //f.Description = p.Description;
+            f.Stock = p.Stock;
+            f.Price = p.Price;
+            f.CategoryID = p.CategoryID;
+
+            fr.TAdd(f);
 
             return RedirectToAction("Index");
         }
         public IActionResult DeleteFood(int id)
         {
-            fr.TRemove(new Food {  FoodID = id});
-            return RedirectToAction("Index"); 
+            fr.TRemove(new Food { FoodID = id });
+            return RedirectToAction("Index");
         }
         public IActionResult FoodGet(int id)
         {

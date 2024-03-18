@@ -10,8 +10,12 @@ namespace CoreAndFood.Controllers
         CategoryRepository cr = new CategoryRepository();
 
         //[Authorize]
-        public IActionResult Index()
+        public IActionResult Index(string p)
         {
+            if (!string.IsNullOrEmpty(p))
+            {
+                return View(cr.List(x => x.CategoryName == p));
+            }
             return View(cr.TList());
         }
         [HttpGet]
@@ -50,7 +54,7 @@ namespace CoreAndFood.Controllers
             cr.TUpdate(x);
             return RedirectToAction("Index");
         }
-        public IActionResult CategoryDelete(int id) 
+        public IActionResult CategoryDelete(int id)
         {
             var x = cr.TGetById(id);
             x.Status = false;

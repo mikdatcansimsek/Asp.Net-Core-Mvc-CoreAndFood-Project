@@ -41,7 +41,7 @@ namespace CoreAndFood.Repositories
             return c.Set<T>().Include(p).ToList();
         }
 
-        public List<T> TList(Expression<Func<T, bool>> filter)
+        public List<T> List(Expression<Func<T, bool>> filter)
         {
             return c.Set<T>().Where(filter).ToList();
         }
